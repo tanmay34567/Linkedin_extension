@@ -1,6 +1,20 @@
+<div align="center">
+
 # 🔗 LinkedIn Scraper & Auto-Engagement Extension
 
-A powerful Chrome extension for scraping LinkedIn profile data and automating feed engagement (likes and comments). Built with Chrome Extension Manifest V3, Node.js, Express, and SQLite.
+[![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-4285F4?logo=google-chrome&logoColor=white)](https://www.google.com/chrome/)
+[![Node.js](https://img.shields.io/badge/Node.js-43853D?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-404D59)](https://expressjs.com/)
+[![SQLite](https://img.shields.io/badge/SQLite-07405E?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![License](https://img.shields.io/badge/License-Educational-yellow.svg)](LICENSE)
+
+**A powerful Chrome extension for scraping LinkedIn profile data and automating feed engagement.**
+
+[Features](#-features) • [Quick Start](#-quick-start) • [Usage](#-usage-guide) • [API](#-api-documentation) • [Contributing](#-contributing)
+
+</div>
+
+---
 
 ## ✨ Features
 
@@ -25,6 +39,22 @@ A powerful Chrome extension for scraping LinkedIn profile data and automating fe
 - **Natural Behavior**: Random delays between actions to appear human-like
 - **Smart Scrolling**: Starts from top, engages with posts in order
 - **Generic Comments**: 15 professional LinkedIn-style comments
+
+## 📸 Screenshots
+
+<div align="center">
+
+### Extension Popup
+<img src="https://via.placeholder.com/600x400/667eea/ffffff?text=Extension+Popup+UI" alt="Extension Popup" width="600"/>
+
+*Profile scraper and feed engagement interface*
+
+### Profile Scraping in Action
+<img src="https://via.placeholder.com/800x400/764ba2/ffffff?text=Scraping+Multiple+Profiles" alt="Scraping Profiles" width="800"/>
+
+*Automatically extracting data from LinkedIn profiles*
+
+</div>
 
 ## 🚀 Quick Start
 
@@ -356,8 +386,131 @@ For issues, questions, or suggestions:
 
 ---
 
-**⚠️ Important**: This tool is for educational purposes. Excessive use of automation on LinkedIn may result in account restrictions. Use responsibly and respect LinkedIn's Terms of Service.
+## 🎬 Demo
+
+Watch the extension in action:
+
+1. **Profile Scraping**: Opens LinkedIn profiles → Scrolls → Extracts data → Saves to database
+2. **Feed Engagement**: Opens feed → Scrolls from top → Likes & comments on posts
+
+> **Note**: Replace with actual demo video or GIFs when available
+
+---
+
+## 🌟 Why Use This Extension?
+
+| Feature | Benefit |
+|---------|---------|
+| 🚀 **Fast Scraping** | Extract data from multiple profiles in minutes |
+| 💾 **Local Storage** | All data stays on your machine - complete privacy |
+| 🤖 **Automation** | Save hours of manual work |
+| 🎯 **Targeted Engagement** | Control exactly how many likes/comments |
+| 🔄 **Auto-Update** | Updates existing profiles instead of duplicating |
+| 📊 **Structured Data** | Clean, organized data in SQLite database |
+
+---
+
+## 🏆 Tech Stack
+
+<table>
+<tr>
+<td align="center" width="33%">
+
+### Frontend
+![Chrome](https://img.shields.io/badge/Chrome-Extension-4285F4?logo=google-chrome&logoColor=white)
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)
+
+</td>
+<td align="center" width="33%">
+
+### Backend
+![Node.js](https://img.shields.io/badge/Node.js-43853D?logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express.js-404D59)
+![Sequelize](https://img.shields.io/badge/Sequelize-52B0E7?logo=sequelize&logoColor=white)
+
+</td>
+<td align="center" width="33%">
+
+### Database
+![SQLite](https://img.shields.io/badge/SQLite-07405E?logo=sqlite&logoColor=white)
+
+</td>
+</tr>
+</table>
+
+---
+
+## ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=tanmay34567/Linkedin_extension&type=Date)](https://star-history.com/#tanmay34567/Linkedin_extension&Date)
+
+---
+
+## 📈 Roadmap
+
+- [ ] Add profile comparison feature
+- [ ] Export data to CSV/JSON
+- [ ] Support for company pages
+- [ ] Advanced filtering options
+- [ ] Bulk profile search
+- [ ] Custom comment templates
+- [ ] Engagement analytics dashboard
+
+---
+
+## ⚠️ Disclaimer
+
+**Important**: This tool is for **educational purposes only**. 
+
+- Excessive automation may violate LinkedIn's Terms of Service
+- Use responsibly and at your own risk
+- Account restrictions may occur with heavy usage
+- Always respect LinkedIn's rate limits and policies
+
+---
+
+## 📞 Support
+
+Having issues? We're here to help!
+
+- 🐛 [Report a Bug](https://github.com/tanmay34567/Linkedin_extension/issues)
+- 💡 [Request a Feature](https://github.com/tanmay34567/Linkedin_extension/issues)
+- 📖 [Read Documentation](#-usage-guide)
+- ⭐ [Star this repo](https://github.com/tanmay34567/Linkedin_extension) if you find it useful!
+
+---
+
+## 👨‍💻 Author
+
+**Tanmay**
+
+- GitHub: [@tanmay34567](https://github.com/tanmay34567)
+- Project: [Linkedin_extension](https://github.com/tanmay34567/Linkedin_extension)
+
+---
+
+## 📜 License
+
+This project is licensed under the **Educational Use License**.
+
+- ✅ Free to use for learning
+- ✅ Free to modify for personal use
+- ❌ Not for commercial use
+- ❌ Not for production deployment
+
+---
+
+<div align="center">
+
+### 🌟 If you found this helpful, please give it a star!
+
+[![GitHub stars](https://img.shields.io/github/stars/tanmay34567/Linkedin_extension?style=social)](https://github.com/tanmay34567/Linkedin_extension/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/tanmay34567/Linkedin_extension?style=social)](https://github.com/tanmay34567/Linkedin_extension/network/members)
 
 **Made with ❤️ for learning and automation**
-#   L i n k e d i n _ e x t e n s i o n  
- 
+
+[⬆ Back to Top](#-linkedin-scraper--auto-engagement-extension)
+
+</div>
