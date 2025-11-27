@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🔗 LinkedIn Scraper & Auto-Engagement Extension
+# 🔗 LinkedIn Profile Scraper
 
 [![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-4285F4?logo=google-chrome&logoColor=white)](https://www.google.com/chrome/)
 [![Node.js](https://img.shields.io/badge/Node.js-43853D?logo=node.js&logoColor=white)](https://nodejs.org/)
@@ -8,7 +8,7 @@
 [![SQLite](https://img.shields.io/badge/SQLite-07405E?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![License](https://img.shields.io/badge/License-Educational-yellow.svg)](LICENSE)
 
-**A powerful Chrome extension for scraping LinkedIn profile data and automating feed engagement.**
+**A powerful Chrome extension for scraping LinkedIn profile data and storing it in a local database.**
 
 [Features](#-features) • [Quick Start](#-quick-start) • [Usage](#-usage-guide) • [API](#-api-documentation) • [Contributing](#-contributing)
 
@@ -32,22 +32,14 @@
 - **Database Storage**: Saves all data to SQLite database via Node.js backend
 - **Update Existing Profiles**: Automatically updates profiles if URL already exists
 
-### 💬 Feed Auto-Engagement
-- **Automated Liking**: Like posts on LinkedIn feed
-- **Automated Commenting**: Comment on posts with generic professional messages
-- **Flexible Configuration**: Set custom like and comment counts (1-50 each)
-- **Natural Behavior**: Random delays between actions to appear human-like
-- **Smart Scrolling**: Starts from top, engages with posts in order
-- **Generic Comments**: 15 professional LinkedIn-style comments
-
 ## 📸 Screenshots
 
 <div align="center">
 
 ### Extension Popup
-<img src="https://via.placeholder.com/600x400/667eea/ffffff?text=Extension+Popup+UI" alt="Extension Popup" width="600"/>
+<img src="https://via.placeholder.com/600x400/667eea/ffffff?text=LinkedIn+Profile+Scraper" alt="Extension Popup" width="600"/>
 
-*Profile scraper and feed engagement interface*
+*Profile scraper interface*
 
 ### Profile Scraping in Action
 <img src="https://via.placeholder.com/800x400/764ba2/ffffff?text=Scraping+Multiple+Profiles" alt="Scraping Profiles" width="800"/>
@@ -113,25 +105,6 @@ Server will run on `http://localhost:4000`
 
 **Note**: Tabs close automatically after scraping. Each profile takes approximately 23 seconds.
 
-### Feed Auto-Engagement
-
-1. **Make sure you're logged into LinkedIn**
-2. **Enter counts** in the Feed Auto-Engagement section:
-   - **Like Count**: Number of posts to like (e.g., 5)
-   - **Comment Count**: Number of posts to comment on (e.g., 3)
-3. **Click "💙 Start Engagement"** (enabled only when both fields have values)
-4. The extension will:
-   - Open LinkedIn feed in a new tab
-   - Scroll to top
-   - Load posts
-   - Like and comment on posts in order from top to bottom
-5. **Wait for completion** (status shown in popup)
-
-**Example Scenarios**:
-- Input: 1 like, 1 comment → Engages with 1 post (likes + comments on it)
-- Input: 5 likes, 3 comments → Engages with 5 posts (likes + comments on first 3, only likes on next 2)
-- Input: 2 likes, 4 comments → Engages with 4 posts (likes + comments on first 2, only comments on next 2)
-
 ## 🏗️ Project Structure
 
 ```
@@ -188,11 +161,6 @@ linkedin_ex/
 - Wait for expansion: 5 seconds
 - **Total: ~23 seconds per profile**
 
-#### Engagement Strategy
-- Scroll from top to bottom
-- Engage with posts in order (not random)
-- Random delays: 1-5 seconds between actions
-- Natural behavior to avoid detection
 
 ### Database Schema
 
