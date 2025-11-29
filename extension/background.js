@@ -2,21 +2,22 @@
 const API_URL = 'http://localhost:4000/api/profiles';
 const DELAY_BETWEEN_PROFILES = 6000; // 6 seconds between each profile
 
-<<<<<<< HEAD
 // Add configuration: set to false to fill comment and let user edit/submit manually.
 // Set to true to auto-submit after filling.
 const AUTO_SUBMIT = false;
 const DEFAULT_COMMENT = 'CFBR';
 
-=======
->>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'startScraping') {
     startScrapingProcess(message.urls);
     sendResponse({ success: true });
   } else if (message.action === 'startEngagement') {
-    startFeedEngagement(message.likeCount, message.commentCount);
+    // Accept optional commentText and autoSubmit from popup; fall back to defaults if not provided
+    const commentText = (typeof message.commentText === 'string' && message.commentText.trim().length > 0) ? message.commentText : DEFAULT_COMMENT;
+    const autoSubmit = (typeof message.autoSubmit === 'boolean') ? message.autoSubmit : AUTO_SUBMIT;
+
+    startFeedEngagement(message.likeCount, message.commentCount, commentText, autoSubmit);
     sendResponse({ success: true });
   }
   return true; // Keep message channel open for async response
@@ -214,11 +215,7 @@ function scrapeLinkedInProfile() {
 
       // If STILL no name, just take the first h1 with any text
       if (!data.name && allH1s.length > 0) {
-<<<<<<< HEAD
-        const firstH1 = allH1s.find(h1 => h.innerText.trim().length > 0);
-=======
         const firstH1 = allH1s.find(h1 => h1.innerText.trim().length > 0);
->>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
         if (firstH1) {
           data.name = firstH1.innerText.trim();
         }
@@ -510,7 +507,6 @@ function scrapeLinkedInProfile() {
 // Send scraped data to backend API
 async function sendToAPI(profileData) {
   try {
-<<<<<<< HEAD
     // Validate profile data
     if (!profileData || !profileData.url) {
       console.error('❌ Invalid profile data - missing URL');
@@ -532,21 +528,15 @@ async function sendToAPI(profileData) {
       };
     }
 
-=======
->>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-<<<<<<< HEAD
         'Accept': 'application/json',
-=======
->>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
       },
       body: JSON.stringify(profileData)
     });
 
-<<<<<<< HEAD
     console.log('📨 Response status:', response.status, response.statusText);
     
     if (!response.ok) {
@@ -576,14 +566,6 @@ async function sendToAPI(profileData) {
       success: false, 
       message: `Fetch error: ${error.message}. Ensure backend server is running on http://localhost:4000` 
     };
-=======
-    const result = await response.json();
-    return result;
-
-  } catch (error) {
-    console.error('Error sending to API:', error);
-    return { success: false, message: error.message };
->>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
   }
 }
 
@@ -604,10 +586,9 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-<<<<<<< HEAD
 // ===== LinkedIn Feed Auto-Engagement =====
-async function startFeedEngagement(likeCount, commentCount) {
-  console.log(`💙 Starting feed engagement: ${likeCount} likes, ${commentCount} comments`);
+async function startFeedEngagement(likeCount, commentCount, commentText = DEFAULT_COMMENT, autoSubmit = AUTO_SUBMIT) {
+  console.log(`💙 Starting feed engagement: ${likeCount} likes, ${commentCount} comments (comment="${commentText}", autoSubmit=${autoSubmit})`);
   
   try {
     // Notify user that LinkedIn feed is opening
@@ -634,11 +615,195 @@ async function startFeedEngagement(likeCount, commentCount) {
       message: 'Engaging with posts...'
     }).catch(() => {});
     
-    // Execute engagement script
+    // Inject a self-contained function into the feed tab. It defines simulateTyping and all logic
     await chrome.scripting.executeScript({
       target: { tabId: feedTab.id },
-      func: engageWithFeed,
-      args: [likeCount, commentCount]
+      func: (likeCount, commentCount, defaultComment, autoSubmit) => {
+        // Helper: simulate typing into inputs / contenteditable to trigger React handlers
+        async function simulateTyping(targetEl, text, charDelay = 60) {
+          if (!targetEl) return;
+          try { targetEl.focus(); } catch (e) {}
+          const tag = (targetEl.tagName || '').toUpperCase();
+          if (tag === 'TEXTAREA' || tag === 'INPUT') {
+            targetEl.value = '';
+            for (const ch of text) {
+              targetEl.value += ch;
+              targetEl.dispatchEvent(new Event('input', { bubbles: true }));
+              await new Promise(r => setTimeout(r, charDelay));
+            }
+            targetEl.dispatchEvent(new Event('change', { bubbles: true }));
+            return;
+          }
+          // contenteditable
+          try {
+            targetEl.focus();
+            targetEl.innerText = '';
+            for (const ch of text) {
+              targetEl.textContent = (targetEl.textContent || '') + ch;
+              try {
+                const range = document.createRange();
+                range.selectNodeContents(targetEl);
+                range.collapse(false);
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+              } catch (e) {}
+              targetEl.dispatchEvent(new InputEvent('input', { bubbles: true, data: ch, inputType: 'insertText' }));
+              await new Promise(r => setTimeout(r, charDelay));
+            }
+            targetEl.dispatchEvent(new InputEvent('input', { bubbles: true, data: text, inputType: 'insertFromPaste' }));
+          } catch (e) {
+            try { targetEl.textContent = text; targetEl.dispatchEvent(new Event('input', { bubbles: true })); } catch (err) {}
+          }
+        }
+
+        // Main engagement logic (self-contained)
+        (async function runEngagement() {
+          try {
+            // Basic scrolling to load posts
+            window.scrollTo(0, 0);
+            await new Promise(r => setTimeout(r, 1200));
+            for (let s = 0; s < 4; s++) { window.scrollBy(0, 700); await new Promise(r => setTimeout(r, 800)); }
+
+            // Find like buttons and dedupe post containers
+            const likeButtons = Array.from(document.querySelectorAll(
+              'button[aria-label*="Like"], button[aria-label*="React"], button[class*="like-button"]'
+            ));
+            const postsMap = new Map();
+            likeButtons.forEach((btn, idx) => {
+              let parent = btn;
+              let depth = 0;
+              while (parent && depth < 16) {
+                parent = parent.parentElement;
+                depth++;
+                if (!parent) break;
+                const classes = parent.className || '';
+                const id = parent.id || '';
+                if (classes.includes('update') || classes.includes('feed-shared') || id.includes('activity') || (parent.getAttribute && (parent.getAttribute('data-id')||'').includes('activity'))) {
+                  const key = (parent.className || '') + '|' + (parent.id || '') + '|' + (parent.getAttribute('data-id') || '');
+                  if (!postsMap.has(key)) postsMap.set(key, { container: parent, likeButton: btn, index: idx });
+                  return;
+                }
+              }
+              // fallback
+              const postContainer = btn.closest('article, div[class*="feed"], div[class*="scaffold"]') || btn.closest('div');
+              const key = 'fallback-' + idx;
+              if (postContainer && !postsMap.has(key)) postsMap.set(key, { container: postContainer, likeButton: btn, index: idx });
+            });
+            const posts = Array.from(postsMap.values());
+
+            // Engage: like then fill comment (leave editable if autoSubmit is false)
+            let liked = 0, commented = 0;
+            const total = Math.max(0, Math.min(likeCount + commentCount, posts.length));
+            for (let i = 0; i < total; i++) {
+              const post = posts[i];
+              if (!post) continue;
+              // Like
+              if (liked < likeCount && post.likeButton) {
+                try {
+                  post.likeButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  await new Promise(r => setTimeout(r, 400));
+                  const isLiked = post.likeButton.getAttribute('aria-pressed') === 'true' || (post.likeButton.className || '').includes('react');
+                  if (!isLiked) { post.likeButton.click(); liked++; await new Promise(r => setTimeout(r, 800 + Math.random()*900)); }
+                } catch (e) {}
+              }
+  
+              // Comment
+              if (commented < commentCount) {
+                try {
+                  // Find comment button(s) for this post
+                  let commentBtn = null;
+                  const commentSelectors = ['button[aria-label*="Comment"]', 'button[aria-label*="Reply"]', 'button[class*="comment-button"]'];
+                  for (const sel of commentSelectors) {
+                    const found = post.container.querySelector(sel);
+                    if (found) { commentBtn = found; break; }
+                  }
+                  if (!commentBtn) {
+                    // try global
+                    for (const sel of commentSelectors) {
+                      const found = document.querySelector(sel);
+                      if (found) { commentBtn = found; break; }
+                    }
+                  }
+                  if (!commentBtn) continue;
+                  commentBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  await new Promise(r => setTimeout(r, 400));
+                  commentBtn.click();
+                  await new Promise(r => setTimeout(r, 800));
+  
+                  // Wait/poll for comment editor
+                  async function waitForSelectorIn(root, selector, timeout = 3000, interval = 120) {
+                    const start = Date.now();
+                    while (Date.now() - start < timeout) {
+                      try {
+                        const el = (root || document).querySelector(selector);
+                        if (el) return el;
+                      } catch (e) {}
+                      await new Promise(r => setTimeout(r, interval));
+                    }
+                    return null;
+                  }
+                  const editorSelectors = ['textarea[class*="comment"]','[contenteditable="true"][role="textbox"]','[contenteditable="true"]','.ql-editor','div[role="textbox"]','textarea'];
+                  let commentBox = null;
+                  for (const sel of editorSelectors) {
+                    commentBox = await waitForSelectorIn(post.container, sel, 1800, 120);
+                    if (commentBox) break;
+                  }
+                  if (!commentBox) {
+                    for (const sel of editorSelectors) {
+                      commentBox = await waitForSelectorIn(document, sel, 2000, 150);
+                      if (commentBox) break;
+                    }
+                  }
+                  if (!commentBox) continue;
+
+                  await simulateTyping(commentBox, defaultComment, 70);
+                  await new Promise(r => setTimeout(r, 700));
+
+                  if (!autoSubmit) {
+                    try { commentBox.focus(); } catch (e) {}
+                    continue;
+                  }
+
+                  const submitSelectors = ['button.comments-comment-box__submit-button','button[aria-label*="Post"]','button[aria-label*="Send"]','button[type="submit"]','button[class*="submit"]'];
+                  let submitButton = null;
+                  const commentContainer = commentBox.closest('[class*="comment"]') || post.container || document;
+                  for (const sel of submitSelectors) {
+                    const found = commentContainer.querySelector(sel);
+                    if (found && !found.disabled && found.offsetParent !== null) { submitButton = found; break; }
+                  }
+                  if (!submitButton) {
+                    for (const sel of submitSelectors) {
+                      const found = document.querySelector(sel);
+                      if (found && !found.disabled && found.offsetParent !== null) { submitButton = found; break; }
+                    }
+                  }
+                  if (submitButton && !submitButton.disabled) {
+                    submitButton.click();
+                    commented++;
+                    await new Promise(r => setTimeout(r, 900 + Math.random()*800));
+                  } else {
+                    // fallback
+                    try {
+                      commentBox.focus();
+                      commentBox.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, ctrlKey: true, bubbles: true }));
+                      commented++;
+                      await new Promise(r => setTimeout(r, 700 + Math.random()*700));
+                    } catch (e) {}
+                  }
+                } catch (err) {}
+              }
+              // break early if done
+              if (liked >= likeCount && commented >= commentCount) break;
+            }
+
+            console.log('Injected engagement finished', { liked, commented });
+          } catch (err) {
+            console.error('Injected engagement error', err);
+          }
+        })();
+      },
+      args: [likeCount, commentCount, commentText, autoSubmit]
     });
     
   } catch (error) {
@@ -650,375 +815,3 @@ async function startFeedEngagement(likeCount, commentCount) {
     }).catch(() => {});
   }
 }
-
-// Function to engage with LinkedIn feed posts
-async function engageWithFeed(likeCount, commentCount) {
-  console.log(`Starting engagement: ${likeCount} likes, ${commentCount} comments`);
-  
-  let liked = 0;
-  let commented = 0;
-  
-  // Generic LinkedIn comments
-  const comments = [
-    'CFBR',
-    'Great insights!',
-    'Thanks for sharing!',
-    'Very informative!',
-    'Interesting perspective!',
-    'Well said!',
-    'Agreed!',
-    'Nice post!',
-    'Love this!',
-    'Absolutely!',
-    'Great content!',
-    'This is helpful!',
-    'Thanks!',
-    'Inspiring!',
-    'Well articulated!'
-  ];
-  
-  // Scroll to top first
-  window.scrollTo(0, 0);
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  
-  // Scroll down to load posts
-  for (let i = 0; i < 5; i++) {
-    window.scrollBy(0, 800);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-  }
-  
-  console.log('🔍 Searching for posts on feed...');
-  
-  // Find all like buttons first
-  const likeButtons = document.querySelectorAll(
-    'button[aria-label*="Like"], button[aria-label*="React"], button[class*="like-button"]'
-  );
-  console.log(`Found ${likeButtons.length} like buttons`);
-  
-  if (likeButtons.length === 0) {
-    console.error('❌ No like buttons found on page');
-    chrome.runtime.sendMessage({
-      action: 'engagementComplete',
-      liked: 0,
-      commented: 0
-    });
-    return;
-  }
-  
-  // Build array of posts by finding unique parent containers for each button
-  const postsMap = new Map();
-  
-  likeButtons.forEach((btn, index) => {
-    // Traverse up the DOM to find the post container
-    let parent = btn;
-    let depth = 0;
-    const maxDepth = 15;
-    
-    while (parent && depth < maxDepth) {
-      parent = parent.parentElement;
-      depth++;
-      
-      if (!parent) break;
-      
-      // Check if this element looks like a post container
-      const classes = parent.className || '';
-      const id = parent.id || '';
-      
-      // Look for post indicators
-      if (
-        classes.includes('update') ||
-        classes.includes('post') ||
-        classes.includes('feed-shared') ||
-        classes.includes('activity') ||
-        id.includes('activity') ||
-        parent.getAttribute('data-id')?.includes('activity')
-      ) {
-        // Use the parent element as key to deduplicate
-        const key = parent.className + parent.id + (parent.getAttribute('data-id') || '');
-        if (!postsMap.has(key)) {
-          postsMap.set(key, {
-            container: parent,
-            likeButton: btn,
-            commentButtons: [],
-            index: index
-          });
-        }
-        return;
-      }
-    }
-    
-    // Fallback: if no post container found, use button's immediate ancestor
-    if (!postsMap.has('fallback-' + index)) {
-      const postContainer = btn.closest('div[class*="feed"], div[class*="scaffold"], article') || 
-                           btn.closest('div');
-      if (postContainer) {
-        postsMap.set('fallback-' + index, {
-          container: postContainer,
-          likeButton: btn,
-          commentButtons: [],
-          index: index
-        });
-      }
-    }
-  });
-  
-  const posts = Array.from(postsMap.values());
-  console.log(`📊 Total unique posts found: ${posts.length}`);
-  
-  if (posts.length === 0) {
-    console.error('❌ Could not map posts');
-    chrome.runtime.sendMessage({
-      action: 'engagementComplete',
-      liked: 0,
-      commented: 0
-    });
-    return;
-  }
-  
-  // Now find comment buttons for each post
-  posts.forEach(post => {
-    const commentSelectors = [
-      'button[aria-label*="Comment"]',
-      'button[aria-label*="Reply"]',
-      'button[class*="comment-button"]'
-    ];
-    
-    for (const selector of commentSelectors) {
-      const buttons = post.container.querySelectorAll(selector);
-      if (buttons.length > 0) {
-        post.commentButtons = Array.from(buttons);
-        break;
-      }
-    }
-  });
-  
-  console.log(`Target: ${likeCount} likes, ${commentCount} comments`);
-  
-  // Engage with posts
-  for (let i = 0; i < Math.min(likeCount + commentCount, posts.length); i++) {
-    const post = posts[i];
-    console.log(`\n📌 Processing post ${i + 1}/${posts.length}`);
-    
-    try {
-      // Like post if needed
-      if (liked < likeCount && post.likeButton) {
-        const btn = post.likeButton;
-        const isLiked = btn.getAttribute('aria-pressed') === 'true' || 
-                       btn.classList.toString().includes('react');
-        
-        if (!isLiked) {
-          btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
-          btn.click();
-          liked++;
-          console.log(`✅ Liked post ${liked}/${likeCount}`);
-          await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
-        }
-      }
-      
-      // Comment on post if needed
-      if (commented < commentCount && post.commentButtons.length > 0) {
-        const commentBtn = post.commentButtons[0];
-        
-        commentBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        commentBtn.click();
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        // Wait for comment input to appear (polling helper)
-        async function waitForSelectorIn(root, selector, timeout = 5000, interval = 200) {
-          const start = Date.now();
-          while (Date.now() - start < timeout) {
-            try {
-              const el = (root || document).querySelector(selector);
-              if (el) return el;
-            } catch (e) { /* ignore */ }
-            await new Promise(r => setTimeout(r, interval));
-          }
-          return null;
-        }
-
-        // Prefer post-local editor then global
-        let commentBox = null;
-        const selectors = [
-          'textarea[class*="comment"]',
-          'textarea[placeholder*="comment"]',
-          'textarea',
-          '[contenteditable="true"][role="textbox"]',
-          '[contenteditable="true"]',
-          '.ql-editor',
-          'div[role="textbox"]'
-        ];
-
-        // Try to find editor inside post.container first with polling
-        for (const sel of selectors) {
-          commentBox = await waitForSelectorIn(post.container, sel, 2500, 150);
-          if (commentBox) break;
-        }
-        // If still not found, try document-wide
-        if (!commentBox) {
-          for (const sel of selectors) {
-            commentBox = await waitForSelectorIn(document, sel, 3000, 150);
-            if (commentBox) break;
-          }
-        }
-
-        if (commentBox) {
-          // Use comment from DEFAULT_COMMENT (editable in code or later via storage)
-          const commentToPost = DEFAULT_COMMENT;
-
-          // Use simulateTyping to type CFBR so React/contenteditable handlers run
-          await simulateTyping(commentBox, commentToPost, 60);
-
-          // small pause to let UI enable submit
-          await new Promise(r => setTimeout(r, 900));
-
-          if (!AUTO_SUBMIT) {
-            // Editable mode: leave the comment filled and focused for manual edit/submit
-            try { commentBox.focus(); } catch (e) { /* ignore */ }
-            console.log(`📝 Filled comment box with "${commentToPost}". Please edit or press Post manually.`);
-            // Do not increment `commented` since we didn't submit.
-            // Continue to next post after a short pause to let user see the filled editor.
-            await new Promise(r => setTimeout(r, 1000));
-            continue; // proceed to next post without auto-submitting
-          }
-
-          // If AUTO_SUBMIT is true, proceed with submit-button or Ctrl+Enter logic
-          // Find submit button inside the comment area first, then globally
-          const submitSelectors = [
-            'button.comments-comment-box__submit-button',
-            'button[class*="submit"]',
-            'button[aria-label*="Post"]',
-            'button[aria-label*="Send"]',
-            'button[type="submit"]'
-          ];
-
-          let submitButton = null;
-          const commentContainer = commentBox.closest('[class*="comment"]') || post.container || document;
-          for (const sel of submitSelectors) {
-            const found = commentContainer.querySelector(sel);
-            if (found && !found.disabled && found.offsetParent !== null) {
-              submitButton = found;
-              break;
-            }
-          }
-          if (!submitButton) {
-            for (const sel of submitSelectors) {
-              const found = document.querySelector(sel);
-              if (found && !found.disabled && found.offsetParent !== null) {
-                submitButton = found;
-                break;
-              }
-            }
-          }
-
-          if (submitButton && !submitButton.disabled) {
-            submitButton.click();
-            commented++;
-            console.log(`✅ Commented on post ${commented}/${commentCount} (clicked submit)`);
-            await new Promise(r => setTimeout(r, 1200 + Math.random() * 1800));
-          } else {
-            // Fallback: try Ctrl+Enter or Enter
-            try {
-              console.warn('⚠️ Submit button not found — trying Ctrl+Enter fallback');
-              commentBox.focus();
-              const kd = new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, ctrlKey: true, bubbles: true });
-              const ku = new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, ctrlKey: true, bubbles: true });
-              commentBox.dispatchEvent(kd);
-              await new Promise(r => setTimeout(r, 60));
-              commentBox.dispatchEvent(ku);
-              await new Promise(r => setTimeout(r, 1200 + Math.random() * 1200));
-              commented++;
-              console.log(`✅ Comment attempted via Ctrl+Enter fallback (assumed).`);
-            } catch (err) {
-              console.error('❌ Fallback posting failed:', err);
-            }
-          }
-        } else {
-          console.warn('⚠️ Could not find comment input box for this post (checked multiple selectors)');
-        }
-      }
-    } catch (error) {
-      console.error('❌ Error processing post:', error);
-    }
-    
-    // Stop if we've completed both actions
-    if (liked >= likeCount && commented >= commentCount) {
-      console.log('✅ All targets reached!');
-      break;
-    }
-  }
-  
-  console.log(`\n✅ Engagement complete! Liked: ${liked}, Commented: ${commented}`);
-  console.log(`Target was: ${likeCount} likes, ${commentCount} comments`);
-  
-  // Send completion message
-  chrome.runtime.sendMessage({
-    action: 'engagementComplete',
-    liked: liked,
-    commented: commented
-  });
-}
-
-// ===== Helper: simulate typing to trigger React/contenteditable handlers =====
-async function simulateTyping(targetEl, text, charDelay = 60) {
-  // For inputs / textareas: append chars to .value and dispatch input events
-  if (!targetEl) return;
-  try {
-    targetEl.focus();
-  } catch (e) {}
-  if (targetEl.tagName === 'TEXTAREA' || targetEl.tagName === 'INPUT') {
-    targetEl.value = ''; // clear first
-    for (const ch of text) {
-      targetEl.value += ch;
-      targetEl.dispatchEvent(new Event('input', { bubbles: true }));
-      await new Promise(r => setTimeout(r, charDelay));
-    }
-    // some handlers also expect change
-    targetEl.dispatchEvent(new Event('change', { bubbles: true }));
-    return;
-  }
-
-  // For contenteditable / rich editors: insert characters and dispatch InputEvent
-  // Best effort: update innerText and dispatch input events per character
-  try {
-    // ensure focus and selection at end
-    targetEl.focus();
-    // clear then type
-    targetEl.innerText = '';
-    for (const ch of text) {
-      // Append char
-      // Use textContent to avoid HTML injection
-      targetEl.textContent = (targetEl.textContent || '') + ch;
-
-      // Update selection to end
-      try {
-        const range = document.createRange();
-        range.selectNodeContents(targetEl);
-        range.collapse(false);
-        const sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(range);
-      } catch (e) { /* ignore */ }
-
-      // Dispatch InputEvent so React picks it up
-      const ev = new InputEvent('input', { bubbles: true, data: ch, inputType: 'insertText' });
-      targetEl.dispatchEvent(ev);
-
-      await new Promise(r => setTimeout(r, charDelay));
-    }
-
-    // Final input event to ensure full text processed
-    targetEl.dispatchEvent(new InputEvent('input', { bubbles: true, data: text, inputType: 'insertFromPaste' }));
-  } catch (e) {
-    // Fallback: set textContent and dispatch generic input
-    try { targetEl.textContent = text; targetEl.dispatchEvent(new Event('input', { bubbles: true })); } catch (err) {}
-  }
-}
-=======
-// Feed auto-engagement feature has been removed
->>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
-
-console.log('🔧 LinkedIn Scraper background service worker loaded');

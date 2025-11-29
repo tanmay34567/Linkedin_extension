@@ -52,7 +52,6 @@ startBtn.addEventListener('click', async () => {
   const invalidUrls = urls.filter(url => !isValidLinkedInUrl(url));
   if (invalidUrls.length > 0) {
     showStatus(`❌ Invalid LinkedIn URLs detected. Please check your input.`, 'error');
-<<<<<<< HEAD
     console.error('Invalid URLs:', invalidUrls);
     return;
   }
@@ -67,8 +66,6 @@ startBtn.addEventListener('click', async () => {
   } catch (e) {
     showStatus('❌ Cannot reach backend server on http://localhost:4000', 'error');
     console.error('Server connection error:', e);
-=======
->>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
     return;
   }
 
@@ -129,7 +126,6 @@ urlsTextarea.addEventListener('input', () => {
   chrome.storage.local.set({ savedUrls: urlsTextarea.value });
 });
 
-<<<<<<< HEAD
 // ===== Feed Auto-Engagement =====
 const likeCountInput = document.getElementById('likeCount');
 const commentCountInput = document.getElementById('commentCount');
@@ -153,17 +149,23 @@ function checkEngageButton() {
 likeCountInput.addEventListener('input', checkEngageButton);
 commentCountInput.addEventListener('input', checkEngageButton);
 
-// Start engagement process
+// Start engagement process (no prompt)
 engageBtn.addEventListener('click', async () => {
-  const likeCount = parseInt(likeCountInput.value);
-  const commentCount = parseInt(commentCountInput.value);
+  const likeCount = parseInt(likeCountInput.value, 10) || 0;
+  const commentCount = parseInt(commentCountInput.value, 10) || 0;
   
-  if (!likeCount || !commentCount || likeCount < 1 || commentCount < 1) {
+  if (likeCount < 1 || commentCount < 1) {
     showEngageStatus('❌ Please enter valid counts for both fields', 'error');
     return;
   }
-  
-  // Disable button
+
+  // Read editable comment and auto-submit toggle from popup inputs
+  const commentTextEl = document.getElementById('commentText');
+  const autoSubmitEl = document.getElementById('autoSubmit');
+  const commentText = (commentTextEl && commentTextEl.value && commentTextEl.value.trim()) ? commentTextEl.value.trim() : 'CFBR';
+  const autoSubmit = !!(autoSubmitEl && autoSubmitEl.checked);
+
+  // Disable button and show status
   engageBtn.disabled = true;
   showEngageStatus('🔄 Starting engagement on LinkedIn feed...', 'info');
   
@@ -171,7 +173,9 @@ engageBtn.addEventListener('click', async () => {
     chrome.runtime.sendMessage({
       action: 'startEngagement',
       likeCount: likeCount,
-      commentCount: commentCount
+      commentCount: commentCount,
+      commentText: commentText,
+      autoSubmit: autoSubmit
     }, (response) => {
       if (chrome.runtime.lastError) {
         showEngageStatus('❌ Error: ' + chrome.runtime.lastError.message, 'error');
@@ -261,7 +265,3 @@ function checkServerHealth() {
 // Check server health when popup opens
 checkServerHealth();
 setInterval(checkServerHealth, 5000); // Check every 5 seconds
-=======
-// Feed auto-engagement feature has been removed
-
->>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
