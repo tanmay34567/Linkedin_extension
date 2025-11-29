@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LinkedIn Scraper</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 450px;
+      min-height: 500px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+    }
+
+    .container {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 8px;
+      color: #0a66c2;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: 'Courier New', monospace;
+      resize: vertical;
+      transition: border-color 0.3s;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #0a66c2;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #666;
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 16px;
+      background: linear-gradient(135deg, #0a66c2 0%, #004182 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(10, 102, 194, 0.4);
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      display: none;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .status.info {
+      background: #e3f2fd;
+      color: #1976d2;
+      border-left: 4px solid #1976d2;
+    }
+
+    .status.success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-left: 4px solid #2e7d32;
+    }
+
+    .status.error {
+      background: #ffebee;
+      color: #c62828;
+      border-left: 4px solid #c62828;
+    }
+
+    .progress {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #e0e0e0;
+      border-radius: 3px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #0a66c2, #004182);
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    .icon {
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>
+      <span class="icon">🔗</span>
+      LinkedIn Scraper
+    </h1>
+    <p class="subtitle">Extract profile data and save to database</p>
+
+    <label for="urls">LinkedIn Profile URLs:</label>
+    <textarea 
+      id="urls" 
+      placeholder="https://www.linkedin.com/in/profile1/&#10;https://www.linkedin.com/in/profile2/&#10;https://www.linkedin.com/in/profile3/"
+    ></textarea>
+    <p class="hint">Enter one URL per line (minimum 3 profiles)</p>
+
+    <button id="startBtn">🚀 Start Scraping</button>
+
+    <div id="status" class="status"></div>
+    
+    <div id="progress" class="progress" style="display: none;">
+      <span id="progressText">Processing: 0/0</span>
+      <div class="progress-bar">
+        <div id="progressFill" class="progress-fill"></div>
+      </div>
+    </div>
+
+    <div style="margin: 16px 0; padding: 8px; background: #f5f5f5; border-radius: 6px; font-size: 12px;">
+      <span id="serverStatus" style="display: flex; align-items: center; gap: 6px;">
+        <span id="statusDot" style="width: 8px; height: 8px; border-radius: 50%; background: #999;"></span>
+        <span id="statusText">Checking server...</span>
+      </span>
+    </div>
+
+    <hr style="margin: 24px 0; border: none; border-top: 2px solid #e0e0e0;">
+
+    <h2 style="font-size: 18px; margin-bottom: 8px; color: #0a66c2; display: flex; align-items: center; gap: 8px;">
+      <span class="icon">💬</span>
+      Feed Auto-Engagement
+    </h2>
+    <p class="subtitle">Automatically like and comment on LinkedIn feed posts</p>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+      <div>
+        <label for="likeCount">Like Count:</label>
+        <input type="number" id="likeCount" min="1" max="50" placeholder="e.g., 5" 
+               style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+      </div>
+      <div>
+        <label for="commentCount">Comment Count:</label>
+        <input type="number" id="commentCount" min="1" max="50" placeholder="e.g., 3" 
+               style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+      </div>
+    </div>
+    <p class="hint">Enter number of posts to like and comment on</p>
+
+    <button id="engageBtn" disabled>💙 Start Engagement</button>
+
+    <div id="engageStatus" class="status"></div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
