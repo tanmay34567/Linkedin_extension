@@ -52,6 +52,7 @@ startBtn.addEventListener('click', async () => {
   const invalidUrls = urls.filter(url => !isValidLinkedInUrl(url));
   if (invalidUrls.length > 0) {
     showStatus(`❌ Invalid LinkedIn URLs detected. Please check your input.`, 'error');
+<<<<<<< HEAD
     console.error('Invalid URLs:', invalidUrls);
     return;
   }
@@ -66,6 +67,8 @@ startBtn.addEventListener('click', async () => {
   } catch (e) {
     showStatus('❌ Cannot reach backend server on http://localhost:4000', 'error');
     console.error('Server connection error:', e);
+=======
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
     return;
   }
 
@@ -126,6 +129,7 @@ urlsTextarea.addEventListener('input', () => {
   chrome.storage.local.set({ savedUrls: urlsTextarea.value });
 });
 
+<<<<<<< HEAD
 // ===== Feed Auto-Engagement =====
 const likeCountInput = document.getElementById('likeCount');
 const commentCountInput = document.getElementById('commentCount');
@@ -257,3 +261,7 @@ function checkServerHealth() {
 // Check server health when popup opens
 checkServerHealth();
 setInterval(checkServerHealth, 5000); // Check every 5 seconds
+=======
+// Feed auto-engagement feature has been removed
+
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db

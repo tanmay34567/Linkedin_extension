@@ -1,5 +1,6 @@
 <div align="center">
 
+<<<<<<< HEAD
 # 🔗 LinkedIn Scraper & Auto-Engagement Extension
 
 [![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-4285F4?logo=google-chrome&logoColor=white)](https://www.google.com/chrome/)
@@ -11,6 +12,19 @@
 **A powerful Chrome extension for scraping LinkedIn profile data and automating feed engagement.**
 
 [Features](#-features) • [Quick Start](#-quick-start) • [Usage](#-usage-guide) • [API](#-api-documentation) • [Contributing](#-contributing)
+=======
+# 🔗 LinkedIn Profile Scraper
+
+[![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-4285F4?logo=google-chrome&logoColor=white)](https://www.google.com/chrome/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-43853D?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-4.18.2-404D59)](https://expressjs.com/)
+[![SQLite](https://img.shields.io/badge/SQLite-3.41+-07405E?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+**A Chrome extension that extracts LinkedIn profile data and stores it in a local SQLite database.**
+
+[Features](#-features) • [Quick Start](#-quick-start) • [Usage](#-usage-guide) • [API](#-api-documentation) • [Database](#-database-schema) • [Contributing](#-contributing)
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
 
 </div>
 
@@ -19,6 +33,7 @@
 ## ✨ Features
 
 ### 📊 Profile Scraper
+<<<<<<< HEAD
 - **Scrape Multiple Profiles**: Extract data from 3+ LinkedIn profiles at once
 - **Comprehensive Data Extraction**:
   - Name
@@ -55,10 +70,32 @@
 *Automatically extracting data from LinkedIn profiles*
 
 </div>
+=======
+- **Multi-Profile Scraping**: Process multiple LinkedIn profiles in sequence
+- **Comprehensive Data Extraction**:
+  - Full Name
+  - Profile URL
+  - Professional Headline
+  - Location Information
+  - Detailed About Section
+  - Follower Count
+  - Connection Count
+- **Smart Scraping**:
+  - Handles dynamic content loading
+  - Intelligent scrolling and delays
+  - Automatic expansion of "See more" sections
+  - Robust error handling
+- **Data Management**:
+  - Local SQLite database storage
+  - Automatic updates of existing profiles
+  - Progress tracking
+  - Detailed logging
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
 
 ## 🚀 Quick Start
 
 ### Prerequisites
+<<<<<<< HEAD
 
 - **Node.js** (v14 or higher)
 - **Chrome Browser**
@@ -131,31 +168,166 @@ Server will run on `http://localhost:4000`
 - Input: 1 like, 1 comment → Engages with 1 post (likes + comments on it)
 - Input: 5 likes, 3 comments → Engages with 5 posts (likes + comments on first 3, only likes on next 2)
 - Input: 2 likes, 4 comments → Engages with 4 posts (likes + comments on first 2, only comments on next 2)
+=======
+- Google Chrome browser
+- Node.js 18 or higher
+- npm or yarn package manager
+- Active LinkedIn account (must be logged in)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/linkedin-profile-scraper.git
+   cd linkedin-profile-scraper
+   ```
+
+2. **Install backend dependencies**
+   ```bash
+   cd backend
+   npm install
+   ```
+
+3. **Load the Chrome extension**
+   - Open Chrome and go to `chrome://extensions/`
+   - Enable "Developer mode" (toggle in top-right)
+   - Click "Load unpacked" and select the `extension` folder
+   - The extension icon should appear in your toolbar
+
+4. **Start the backend server**
+   ```bash
+   npm start
+   ```
+   Server will be available at `http://localhost:4000`
+
+## �️ Usage Guide
+
+### Scraping Profiles
+
+1. **Prepare Profile URLs**
+   - Open LinkedIn and navigate to profiles you want to scrape
+   - Copy the profile URLs (one per line)
+
+2. **Using the Extension**
+   - Click the extension icon in Chrome
+   - Paste the profile URLs in the text area
+   - Click "🚀 Start Scraping"
+   - The extension will open each profile in a new tab
+   - Progress will be shown in the popup
+
+3. **Viewing Results**
+   - All scraped data is saved to the SQLite database
+   - Access the data via the API or a database viewer
+   - The database file is located at `backend/database.sqlite`
+
+### Scraping Process
+- Each profile takes approximately 23 seconds to process
+- The extension handles scrolling and content loading automatically
+- Progress is saved if the extension is closed
+- Failed profiles can be retried by running the process again
+
+## 📊 Database Schema
+
+```sql
+CREATE TABLE profiles (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT,
+  url TEXT NOT NULL UNIQUE,
+  about TEXT,
+  bio TEXT,
+  location TEXT,
+  followerCount INTEGER DEFAULT 0,
+  connectionCount INTEGER DEFAULT 0,
+  createdAt DATETIME,
+  updatedAt DATETIME
+);
+```
+
+## 🌐 API Documentation
+
+### POST /api/profiles
+Create or update a profile
+
+**Request Body:**
+```json
+{
+  "name": "John Doe",
+  "url": "https://www.linkedin.com/in/johndoe",
+  "about": "Experienced professional...",
+  "bio": "Software Engineer at Tech Corp",
+  "location": "San Francisco, CA",
+  "followerCount": 500,
+  "connectionCount": 300
+}
+```
+
+### GET /api/profiles
+Get all profiles
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "url": "https://www.linkedin.com/in/johndoe",
+      "about": "Experienced professional...",
+      "bio": "Software Engineer at Tech Corp",
+      "location": "San Francisco, CA",
+      "followerCount": 500,
+      "connectionCount": 300,
+      "createdAt": "2023-11-27T12:00:00.000Z",
+      "updatedAt": "2023-11-27T12:00:00.000Z"
+    }
+  ]
+}
+```
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
 
 ## 🏗️ Project Structure
 
 ```
+<<<<<<< HEAD
 linkedin_ex/
+=======
+linkedin-profile-scraper/
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
 ├── extension/                 # Chrome Extension
 │   ├── manifest.json         # Extension configuration
 │   ├── popup.html            # Extension popup UI
 │   ├── popup.js              # Popup logic and event handlers
+<<<<<<< HEAD
 │   └── background.js         # Service worker (main scraping logic)
 ├── backend/                  # Node.js Backend
 │   ├── app.js               # Express server setup
 │   ├── config/
 │   │   └── database.js      # Database configuration
+=======
+│   ├── background.js         # Service worker (main scraping logic)
+│   ├── content.js            # Content script for DOM interaction
+│   └── icons/                # Extension icons
+├── backend/                  # Node.js Backend
+│   ├── app.js               # Express server setup
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
 │   ├── models/
 │   │   └── profile.js       # Sequelize Profile model
 │   ├── routes/
 │   │   └── profileRoutes.js # API routes for profiles
+<<<<<<< HEAD
 │   ├── package.json         # Backend dependencies
 │   └── database.sqlite      # SQLite database (auto-created)
+=======
+│   ├── database.sqlite      # SQLite database (auto-created)
+│   └── package.json         # Backend dependencies
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
 └── README.md                # This file
 ```
 
 ## 🔧 Technical Details
 
+<<<<<<< HEAD
 ### Architecture
 
 #### Chrome Extension (Manifest V3)
@@ -210,6 +382,58 @@ Profile {
   updatedAt: DATETIME
 }
 ```
+=======
+### Scraping Strategy
+- Uses a combination of DOM queries and text analysis
+- Handles LinkedIn's dynamic content loading
+- Implements smart delays to avoid rate limiting
+- Automatically expands "See more" sections
+- Robust error handling and retries
+
+### Performance
+- Processes each profile in ~23 seconds
+- Supports concurrent tab management
+- Efficient memory usage
+- Detailed logging for debugging
+
+## 🚨 Important Notes
+
+### Rate Limiting
+- The extension includes built-in delays to avoid LinkedIn's rate limits
+- Do not reduce delays below recommended values
+- Processing too many profiles too quickly may trigger LinkedIn's security measures
+
+### Data Privacy
+- All data is stored locally in your SQLite database
+- No data is sent to external servers
+- The extension only communicates with your local backend
+
+### LinkedIn Policies
+- Use this tool responsibly and in compliance with LinkedIn's Terms of Service
+- Be mindful of LinkedIn's scraping policies
+- The extension is for educational purposes only
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin feature/your-feature`)
+5. Create a new Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with [Chrome Extension Manifest V3](https://developer.chrome.com/docs/extensions/mv3/)
+- Backend powered by [Express.js](https://expressjs.com/) and [Sequelize](https://sequelize.org/)
+- Database using [SQLite](https://www.sqlite.org/)
+- Icons from [Feather Icons](https://feathericons.com/)
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
 
 ## 🎯 Key Features Explained
 
@@ -314,6 +538,7 @@ Also update `extension/background.js`:
 const API_URL = 'http://localhost:4000/api/profiles'; // Update port
 ```
 
+<<<<<<< HEAD
 ## 📦 Push to GitHub (quick guide)
 
 1. Create a repository on GitHub (e.g., https://github.com/your-username/Linkedin_extension).
@@ -339,6 +564,8 @@ Automation scripts are available in the `scripts/` folder to help with Windows o
 - **Unix**: `scripts/git_push.sh`
 - **Windows**: `scripts/git_push.bat`
 
+=======
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
 ## 📝 API Documentation
 
 ### Create/Update Profile

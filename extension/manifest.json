@@ -10,8 +10,12 @@
     "storage"
   ],
   "host_permissions": [
+<<<<<<< HEAD
     "https://www.linkedin.com/*",
     "http://localhost/*"
+=======
+    "https://www.linkedin.com/*"
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
   ],
   "action": {
     "default_popup": "popup.html"
@@ -25,6 +29,7 @@
       "js": ["content.js"],
       "run_at": "document_idle"
     }
+<<<<<<< HEAD
   ],
   "web_accessible_resources": [
     {
@@ -35,4 +40,7 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self';"
   }
+=======
+  ]
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
 }

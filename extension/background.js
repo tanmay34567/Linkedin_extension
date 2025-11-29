@@ -2,11 +2,14 @@
 const API_URL = 'http://localhost:4000/api/profiles';
 const DELAY_BETWEEN_PROFILES = 6000; // 6 seconds between each profile
 
+<<<<<<< HEAD
 // Add configuration: set to false to fill comment and let user edit/submit manually.
 // Set to true to auto-submit after filling.
 const AUTO_SUBMIT = false;
 const DEFAULT_COMMENT = 'CFBR';
 
+=======
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'startScraping') {
@@ -211,7 +214,11 @@ function scrapeLinkedInProfile() {
 
       // If STILL no name, just take the first h1 with any text
       if (!data.name && allH1s.length > 0) {
+<<<<<<< HEAD
         const firstH1 = allH1s.find(h1 => h.innerText.trim().length > 0);
+=======
+        const firstH1 = allH1s.find(h1 => h1.innerText.trim().length > 0);
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
         if (firstH1) {
           data.name = firstH1.innerText.trim();
         }
@@ -503,6 +510,7 @@ function scrapeLinkedInProfile() {
 // Send scraped data to backend API
 async function sendToAPI(profileData) {
   try {
+<<<<<<< HEAD
     // Validate profile data
     if (!profileData || !profileData.url) {
       console.error('❌ Invalid profile data - missing URL');
@@ -524,15 +532,21 @@ async function sendToAPI(profileData) {
       };
     }
 
+=======
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+<<<<<<< HEAD
         'Accept': 'application/json',
+=======
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
       },
       body: JSON.stringify(profileData)
     });
 
+<<<<<<< HEAD
     console.log('📨 Response status:', response.status, response.statusText);
     
     if (!response.ok) {
@@ -562,6 +576,14 @@ async function sendToAPI(profileData) {
       success: false, 
       message: `Fetch error: ${error.message}. Ensure backend server is running on http://localhost:4000` 
     };
+=======
+    const result = await response.json();
+    return result;
+
+  } catch (error) {
+    console.error('Error sending to API:', error);
+    return { success: false, message: error.message };
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
   }
 }
 
@@ -582,6 +604,7 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+<<<<<<< HEAD
 // ===== LinkedIn Feed Auto-Engagement =====
 async function startFeedEngagement(likeCount, commentCount) {
   console.log(`💙 Starting feed engagement: ${likeCount} likes, ${commentCount} comments`);
@@ -994,5 +1017,8 @@ async function simulateTyping(targetEl, text, charDelay = 60) {
     try { targetEl.textContent = text; targetEl.dispatchEvent(new Event('input', { bubbles: true })); } catch (err) {}
   }
 }
+=======
+// Feed auto-engagement feature has been removed
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
 
 console.log('🔧 LinkedIn Scraper background service worker loaded');

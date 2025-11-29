@@ -6,14 +6,18 @@ const Profile = require('../models/profile');
 // POST endpoint to create a new profile
 router.post('/profiles', async (req, res) => {
   try {
+<<<<<<< HEAD
     console.log('📥 Received POST request');
     console.log('Content-Type:', req.get('Content-Type'));
     console.log('Request body:', JSON.stringify(req.body).substring(0, 300));
     
+=======
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
     const { name, url, about, bio, location, followerCount, connectionCount } = req.body;
 
     // Validate required fields (only URL is required now)
     if (!url) {
+<<<<<<< HEAD
       console.error('❌ Validation failed: URL is missing');
       return res.status(400).json({
         success: false,
@@ -38,6 +42,17 @@ router.post('/profiles', async (req, res) => {
     const existingProfile = await Profile.findOne({ where: { url } });
     if (existingProfile) {
       console.log('📝 Updating existing profile:', url);
+=======
+      return res.status(400).json({
+        success: false,
+        message: 'URL is required',
+      });
+    }
+
+    // Check if profile already exists
+    const existingProfile = await Profile.findOne({ where: { url } });
+    if (existingProfile) {
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
       // Update existing profile
       await existingProfile.update({
         name: name || existingProfile.name,
@@ -56,7 +71,10 @@ router.post('/profiles', async (req, res) => {
     }
 
     // Create new profile
+<<<<<<< HEAD
     console.log('➕ Creating new profile:', url);
+=======
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
     const profile = await Profile.create({
       name,
       url,
@@ -67,15 +85,22 @@ router.post('/profiles', async (req, res) => {
       connectionCount: connectionCount || 0,
     });
 
+<<<<<<< HEAD
     console.log('✅ Profile created with ID:', profile.id);
+=======
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
     res.status(201).json({
       success: true,
       message: 'Profile created successfully',
       data: profile,
     });
   } catch (error) {
+<<<<<<< HEAD
     console.error('❌ Error creating/updating profile:', error);
     console.error('Error details:', error.message);
+=======
+    console.error('Error creating profile:', error);
+>>>>>>> a1df76eb3f69ee4710cf81f6900e26f995e4a1db
     res.status(500).json({
       success: false,
       message: 'Internal server error',
